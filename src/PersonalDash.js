@@ -1,379 +1,474 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
-  Zap, Sparkles, LogOut, Play, Terminal, 
-  BarChart3, Code2, Trophy, Bot, Brain, Activity, 
-  Network, LayoutDashboard, Cpu, FolderGit2, Settings,
-  Flame, Bell, Search, ChevronRight, CheckCircle2
+  Zap, LogOut, Terminal, Brain, Layers, Cpu, Shield, 
+  TrendingUp, Lock, Unlock, Play, Send, CheckCircle2, 
+  ChevronRight, BookOpen, AlertTriangle, User, RefreshCw
 } from 'lucide-react';
+import Editor from '@monaco-editor/react';
 
-// --- PREMIUM SVG COMPONENTS ---
-const TrendLineSvg = ({ color }) => (
-  <svg viewBox="0 0 100 25" className="w-full h-10 drop-shadow-md overflow-visible">
-    <polyline points="0,20 15,15 30,22 45,10 60,18 75,5 90,12 100,2" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-    <circle cx="100" cy="2" r="3" fill={color} className="animate-pulse shadow-[0_0_10px_rgba(currentColor,0.8)]"/>
-  </svg>
-);
-
-const AreaChartSvg = ({ colorPrimary, colorSecondary }) => (
-  <svg viewBox="0 0 100 40" className="w-full h-12 overflow-visible">
-    <defs>
-      <linearGradient id="premiumGlow" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stopColor={colorPrimary} stopOpacity="0.4" />
-        <stop offset="100%" stopColor={colorPrimary} stopOpacity="0" />
-      </linearGradient>
-    </defs>
-    <polyline points="0,35 20,20 40,28 60,10 80,15 100,0" fill="none" stroke={colorSecondary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    <polygon points="0,35 20,20 40,28 60,10 80,15 100,0 100,40 0,40" fill="url(#premiumGlow)"/>
-  </svg>
-);
-
-// --- PREMIUM TELEMETRY CARD ---
-const StatCard = ({ title, value, icon: Icon, subtitle, chart, trend }) => (
-  <div className="bg-[#0b0b12]/60 backdrop-blur-2xl border border-white/[0.05] rounded-2xl p-6 flex flex-col justify-between relative group overflow-hidden transition-all duration-500 hover:bg-[#11111a]/80 hover:border-white/[0.1] hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.5)]">
-    {/* Subtle top inner border highlight */}
-    <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/[0.1] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"/>
-    
-    <div className="flex justify-between items-start mb-6">
-      <div className="flex items-center space-x-3">
-        <div className="bg-white/[0.03] p-2.5 rounded-xl border border-white/[0.05] text-slate-400 group-hover:text-white group-hover:bg-white/[0.08] transition-all duration-300">
-          <Icon className="w-4 h-4" />
-        </div>
-        <span className="text-xs font-medium text-slate-400 uppercase tracking-widest">{title}</span>
-      </div>
-      {trend && (
-        <span className="text-[10px] font-mono font-bold text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-md border border-emerald-400/20 flex items-center">
-          <Flame className="w-3 h-3 mr-1" /> {trend}
-        </span>
-      )}
-    </div>
-    
-    <div>
-      <div className="text-3xl font-bold text-white mb-1 tracking-tight">{value}</div>
-      <div className="text-xs text-slate-500 font-mono mb-4">{subtitle}</div>
-      {chart && <div className="mt-4">{chart}</div>}
-    </div>
-  </div>
-);
+// ==========================================
+// CENTRALIZED DASHBOARD INTERNAL STORAGE ENGINE
+// ==========================================
+const DASHBOARD_DATA = {
+  programming: {
+    courseTitle: "Core Python & Advanced Systems Engineering",
+    mentorName: "Alex (Senior Systems Architect)",
+    mentorRole: "Senior Software Engineer",
+    initialCode: `# Topic 1.1: Advanced Memory Allocation\n# Task: Optimize the sequence tracker to prevent memory bloat.\n\nimport sys\n\ndef track_vector_allocation():\n    # Analyze deep vs shallow copy mutations below\n    matrix_node = [i for i in range(100000)]\n    print(f"Node Memory Footprint: {sys.getsizeof(matrix_node)} bytes")\n\ntrack_vector_allocation()`,
+    chapters: [
+      {
+        id: "py_ch_1",
+        title: "The Runtime & Foundations",
+        topics: [
+          { id: "py_top_1.1", title: "Memory Allocation & Deep vs Shallow Copies", duration: "45m", difficulty: "Advanced" },
+          { id: "py_top_1.2", title: "Dunder Methods & Object Lifecycle Engineering", duration: "60m", difficulty: "Expert" }
+        ]
+      },
+      {
+        id: "py_ch_2",
+        title: "Functional Architecture & Pipelines",
+        topics: [
+          { id: "py_top_2.1", title: "Closures, Decorators, and Metaprogramming", duration: "90m", difficulty: "Expert" },
+          { id: "py_top_2.2", title: "High-Performance Generator Pipelines", duration: "50m", difficulty: "Intermediate" }
+        ]
+      }
+    ]
+  },
+  trading: {
+    courseTitle: "Technical Analysis & Advanced Derivatives",
+    mentorName: "Marcus (Quantitative Risk Advisor)",
+    mentorRole: "Strict Quantitative Risk Manager",
+    initialCode: `// Options Greeks Greeks Exposure Analysis Core Engine\n// Asset: NIFTY 50 Near-Month Expiry Contract\n\nfunction calculateDeltaRisk(spotPrice, strikePrice, volatility, daysToExpiry) {\n    // Delta exposure mapping engine initialization\n    let variance = volatility * Math.sqrt(daysToExpiry / 365);\n    return "Risk Profile Stable // Expected Delta: 0.62";\n}`,
+    chapters: [
+      {
+        id: "tr_ch_1",
+        title: "Price Action & Market Psychology",
+        topics: [
+          { id: "tr_top_1.1", title: "Candlestick Volumetric Anatomy", duration: "40m", difficulty: "Intermediate" },
+          { id: "tr_top_1.2", title: "Institutional Order Block Mapping", duration: "55m", difficulty: "Advanced" }
+        ]
+      },
+      {
+        id: "tr_ch_2",
+        title: "Derivatives Mechanics & Greeks",
+        topics: [
+          { id: "tr_top_2.1", title: "Navigating Options Greeks (Delta/Gamma)", duration: "75m", difficulty: "Advanced" },
+          { id: "tr_top_2.2", title: "Position Sizing & Strict Drawdown Math", duration: "60m", difficulty: "Expert" }
+        ]
+      }
+    ]
+  }
+};
 
 export default function Dashboard({ handleLogout }) {
-  const [activeMenu, setActiveMenu] = useState('dashboard');
+  // --- LAYER STATE MANAGEMENT ---
+  const [activeTrack, setActiveTrack] = useState('programming');
+  const [selectedTopic, setSelectedTopic] = useState({ id: "py_top_1.1", title: "Memory Allocation & Deep vs Shallow Copies" });
+  
+  // Pay-As-You-Go Ledger: Instantly records unlocked tracks (Simulating your ₹125 entry ledger)
+  const [unlockedLedger, setUnlockedLedger] = useState(['py_top_1.1']);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [topicPendingUnlock, setTopicPendingUnlock] = useState(null);
 
-  const menuItems = [
-    { id: 'dashboard', label: 'System Overview', icon: LayoutDashboard },
-    { id: 'modules', label: 'Neural Modules', icon: Cpu },
-    { id: 'projects', label: 'Repositories', icon: FolderGit2 },
-    { id: 'analytics', label: 'Telemetry', icon: Activity },
-    { id: 'settings', label: 'Configuration', icon: Settings },
-  ];
+  // Workspace code state triggers
+  const [code, setCode] = useState(DASHBOARD_DATA.programming.initialCode);
+  const [terminalOutput, setTerminalOutput] = useState([`System Initialization Successful...`, `Ready for system execution diagnostics.`]);
+  const [isRunning, setIsRunning] = useState(false);
+
+  // AI Chat streams
+  const [chatMessage, setChatMessage] = useState('');
+  const [aiChatLogs, setAiChatLogs] = useState([
+    { sender: 'ai', text: "Sequence initialized. Select an unlocked module, deploy your architecture inside the terminal loop, and request optimization parameters when ready." }
+  ]);
+
+  // Sync workspace templates dynamically when track alterations execute
+  useEffect(() => {
+    const defaultTopic = DASHBOARD_DATA[activeTrack].chapters[0].topics[0];
+    setSelectedTopic(defaultTopic);
+    setCode(DASHBOARD_DATA[activeTrack].initialCode);
+    setTerminalOutput([`Switched workspace environment to: ${DASHBOARD_DATA[activeTrack].courseTitle}`, `System state ready.`]);
+    setAiChatLogs([
+      { sender: 'ai', text: `System context swapped. I am now acting as your ${DASHBOARD_DATA[activeTrack].mentorName}. Let's break down systems architecture.` }
+    ]);
+  }, [activeTrack]);
+
+  // --- INTERACTIVE ARCHITECTURE FUNCTIONS ---
+  const handleTopicSelection = (topic) => {
+    if (unlockedLedger.includes(topic.id)) {
+      setSelectedTopic(topic);
+    } else {
+      setTopicPendingUnlock(topic);
+      setShowPaymentModal(true);
+    }
+  };
+
+  const executeLedgerPaymentSimulation = () => {
+    if (topicPendingUnlock) {
+      setUnlockedLedger([...unlockedLedger, topicPendingUnlock.id]);
+      setSelectedTopic(topicPendingUnlock);
+      setShowPaymentModal(false);
+      setTerminalOutput([
+        ...terminalOutput, 
+        `LEDGER SUCCESS: Transaction Verified. Topic [${topicPendingUnlock.title}] permanently unlocked via Micro-Transaction Ledger.`
+      ]);
+      setTopicPendingUnlock(null);
+    }
+  };
+
+  const handleRunDiagnostics = () => {
+    setIsRunning(true);
+    setTerminalOutput([...terminalOutput, `⚙️ Compiling and running runtime test modules...`]);
+    
+    setTimeout(() => {
+      setIsRunning(false);
+      if (activeTrack === 'programming') {
+        setTerminalOutput([
+          ...terminalOutput,
+          `>> Node Memory Footprint: 800024 bytes`,
+          `>> Execution Matrix: Completed with 0 allocation leaks.`,
+          `SUCCESS: Vector compilation execution vector stabilized at 12ms throughput.`
+        ]);
+      } else {
+        setTerminalOutput([
+          ...terminalOutput,
+          `>> Delta Risk Variance: 0.6204`,
+          `>> Gamma Sensitivity Factor: 0.041`,
+          `DIAGNOSTIC CRITICAL: Position hedge ratios require rebalancing under extreme downside vectors.`
+        ]);
+      }
+    }, 1200);
+  };
+
+  const handleSendAiComms = (e) => {
+    e.preventDefault();
+    if (!chatMessage.trim()) return;
+
+    const userMessage = chatMessage;
+    const currentLogs = [...aiChatLogs, { sender: 'user', text: userMessage }];
+    setAiChatLogs(currentLogs);
+    setChatMessage('');
+
+    // Simulated contextual AI responses matching premium platform vectors
+    setTimeout(() => {
+      let aiResponseText = "";
+      if (activeTrack === 'programming') {
+        aiResponseText = `Architectural analysis requested on: "${userMessage}". To optimize this allocation stack, minimize mutable pointer objects. Consider deploying explicit slots mapping inside tracking definitions.`;
+      } else {
+        aiResponseText = `Risk telemetry updated based on "${userMessage}". Under high volatility metrics, your gamma hedging parameters must compress. Ensure your stop-loss math scales with current implied volatility metrics.`;
+      }
+      setAiChatLogs([...currentLogs, { sender: 'ai', text: aiResponseText }]);
+    }, 1000);
+  };
 
   return (
-    <div className="flex h-screen bg-[#020204] text-slate-300 font-sans overflow-hidden selection:bg-cyan-500/30">
+    <div className="min-h-screen bg-[#020617] text-gray-100 flex flex-col font-sans overflow-hidden">
       
-      {/* --- AMBIENT LIGHTING ENGINE --- */}
-      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-emerald-900/20 blur-[120px] rounded-full mix-blend-screen"/>
-        <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-cyan-900/15 blur-[150px] rounded-full mix-blend-screen"/>
-        <div className="absolute top-[40%] left-[60%] w-[30%] h-[30%] bg-purple-900/10 blur-[100px] rounded-full mix-blend-screen"/>
-        {/* Subtle grid texture */}
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+CiAgPGc+CiAgICA8cGF0aCBkPSJNMjAsMCBMMjAsNDAgTTAsMjAgTDQwLDIwIiBmaWxsPSJub25lIiBzdHJva2U9InJnYmEoMjU1LDI1NSwyNTUsMC4wMykiIHN0cm9rZS13aWR0aD0iMSIvPgogIDwvZz4KPC9zdmc+')] opacity-50"/>
-      </div>
-
-      {/* --- LEFT SIDEBAR (ALWAYS OPEN) --- */}
-      <aside className="w-[280px] h-full flex flex-col bg-[#050508]/80 backdrop-blur-3xl border-r border-white/[0.05] z-20 shrink-0">
-        {/* Logo Area */}
-        <div className="h-24 flex items-center px-8 border-b border-white/[0.05] relative">
-          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-cyan-400 to-emerald-400 rounded-r-full shadow-[0_0_15px_rgba(6,182,212,0.5)]"/>
-          <div className="bg-gradient-to-br from-white/[0.08] to-transparent p-2 rounded-xl border border-white/[0.05] mr-4">
-            <Zap className="w-5 h-5 text-cyan-400" />
+      {/* APP TOP COMMAND HEADER NAVBAR */}
+      <header className="bg-[#0a1020]/80 border-b border-white/5 px-6 py-4 flex items-center justify-between backdrop-blur-md shrink-0">
+        <div className="flex items-center space-x-3">
+          <div className="bg-emerald-500/10 p-2 rounded-xl border border-emerald-500/20">
+            <Zap className="w-5 h-5 text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
           </div>
           <div>
-            <h1 className="text-xl font-black tracking-tighter text-white leading-none">
-              NEXUS<span className="text-cyan-400">DEV</span>
+            <h1 className="text-xl font-black tracking-tight text-white flex items-center">
+              NEXUS<span className="text-emerald-400">DEV</span> 
+              <span className="ml-3 text-xs tracking-widest bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2.5 py-0.5 rounded-full uppercase font-bold">LAB SUITE</span>
             </h1>
-            <span className="text-[9px] font-mono text-slate-500 uppercase tracking-widest mt-1 block">Engineering OS v2.4</span>
           </div>
         </div>
 
-        {/* Navigation */}
-        <div className="flex-1 px-4 py-8 space-y-2 overflow-y-auto no-scrollbar">
-          <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest px-4 mb-4">Main Menu</div>
-          {menuItems.map((item) => {
-            const isActive = activeMenu === item.id;
-            return (
-              <button 
-                key={item.id}
-                onClick={() => setActiveMenu(item.id)}
-                className={`w-full flex items-center px-4 py-3 rounded-xl transition-all duration-300 group ${
-                  isActive 
-                  ? 'bg-gradient-to-r from-cyan-500/10 to-transparent text-white border border-cyan-500/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]' 
-                  : 'text-slate-400 hover:text-white hover:bg-white/[0.03]'
-                }`}
-              >
-                <item.icon className={`w-4 h-4 mr-4 ${isActive ? 'text-cyan-400' : 'text-slate-500 group-hover:text-slate-300'}`} />
-                <span className="font-medium text-sm">{item.label}</span>
-                {isActive && <ChevronRight className="w-4 h-4 ml-auto text-cyan-500/50" />}
-              </button>
-            );
-          })}
+        {/* WORKSPACE CENTRAL HUB QUICK TUNER */}
+        <div className="flex bg-[#020617] border border-white/15 p-1 rounded-xl">
+          <button 
+            onClick={() => setActiveTrack('programming')}
+            className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-bold text-xs transition-all ${activeTrack === 'programming' ? 'bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
+          >
+            <Terminal className="w-3.5 h-3.5" /> <span>PROGRAMMING ENVIRONMENT</span>
+          </button>
+          <button 
+            onClick={() => setActiveTrack('trading')}
+            className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-bold text-xs transition-all ${activeTrack === 'trading' ? 'bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
+          >
+            <TrendingUp className="w-3.5 h-3.5" /> <span>TRADING RISK SIMULATOR</span>
+          </button>
         </div>
 
-        {/* User Profile Area */}
-        <div className="p-4 border-t border-white/[0.05] bg-gradient-to-t from-black/40 to-transparent">
-          <div className="flex items-center p-3 rounded-xl hover:bg-white/[0.03] transition-colors cursor-pointer border border-transparent hover:border-white/[0.05] group">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-emerald-500 to-cyan-500 p-[2px] mr-3">
-              <div className="w-full h-full rounded-full bg-[#050508] flex items-center justify-center border border-black">
-                <span className="text-xs font-bold text-white">E1</span>
-              </div>
-            </div>
-            <div className="flex-1 overflow-hidden">
-              <div className="text-sm font-bold text-white truncate">ENGINEER_001</div>
-              <div className="text-[10px] font-mono text-emerald-400 flex items-center">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse mr-1.5"/>
-                System Online
-              </div>
-            </div>
-            <LogOut onClick={handleLogout} className="w-4 h-4 text-slate-500 hover:text-red-400 transition-colors" />
-          </div>
-        </div>
-      </aside>
+        {/* OPERATOR DISCONNECT ACTION */}
+        <button 
+          onClick={handleLogout} 
+          className="flex items-center space-x-2 bg-white/5 hover:bg-red-500/10 border border-white/10 hover:border-red-500/30 px-4 py-2 rounded-xl text-xs font-bold text-gray-300 hover:text-red-400 transition-all"
+        >
+          <LogOut className="w-3.5 h-3.5" /> <span className="hidden md:inline">Disconnect Session</span>
+        </button>
+      </header>
 
-      {/* --- MAIN CONTENT AREA --- */}
-      <main className="flex-1 h-full overflow-y-auto overflow-x-hidden relative z-10 no-scrollbar">
+      {/* THREE-PANEL CORE RUNTIME WORKSPACE */}
+      <div className="flex-1 flex overflow-hidden">
         
-        {/* Top Navbar */}
-        <header className="h-24 px-8 lg:px-12 flex items-center justify-between sticky top-0 z-30 bg-[#020204]/80 backdrop-blur-xl border-b border-white/[0.02]">
-          <div className="flex flex-col">
-            <h2 className="text-2xl font-bold text-white tracking-tight">System Overview</h2>
-            <div className="text-xs font-mono text-slate-500 flex items-center mt-1">
-              <Network className="w-3.5 h-3.5 mr-2 text-cyan-400" />
-              Node: <span className="text-slate-300 ml-1">US-EAST-1</span> <span className="mx-2">|</span> Latency: <span className="text-emerald-400 ml-1">12ms</span>
-            </div>
+        {/* PANEL 1: MODULAR MICRO-CURRICULUM RAIL SIDEBAR */}
+        <aside className="w-80 bg-[#060b18] border-r border-white/5 flex flex-col overflow-y-auto shrink-0 hidden lg:flex">
+          <div className="p-4 border-b border-white/5 bg-[#0a1020]/40">
+            <div className="text-xs text-gray-500 font-bold uppercase tracking-widest mb-1">Active Ledger Engine</div>
+            <h2 className="text-sm font-black text-white truncate">{DASHBOARD_DATA[activeTrack].courseTitle}</h2>
           </div>
 
-          <div className="flex items-center space-x-6">
-            <div className="hidden md:flex items-center bg-[#0a0a10] border border-white/[0.05] rounded-full px-4 py-2">
-              <Search className="w-4 h-4 text-slate-500 mr-2" />
-              <input 
-                type="text" 
-                placeholder="Query system data..." 
-                className="bg-transparent border-none outline-none text-sm text-white placeholder-slate-600 w-48 font-mono"
-              />
-              <div className="text-[10px] font-mono bg-white/[0.05] text-slate-400 px-1.5 py-0.5 rounded ml-2">⌘K</div>
+          <div className="p-4 space-y-6">
+            {DASHBOARD_DATA[activeTrack].chapters.map((chapter, cIdx) => (
+              <div key={chapter.id} className="space-y-2">
+                <div className="flex items-center space-x-2 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                  <BookOpen className="w-3.5 h-3.5 text-blue-400" />
+                  <span>Node {cIdx + 1}: {chapter.title}</span>
+                </div>
+                
+                <div className="space-y-1">
+                  {chapter.topics.map((topic) => {
+                    const isUnlocked = unlockedLedger.includes(topic.id);
+                    const isSelected = selectedTopic.id === topic.id;
+                    return (
+                      <button
+                        key={topic.id}
+                        onClick={() => handleTopicSelection(topic)}
+                        className={`w-full flex flex-col p-3 rounded-xl border transition-all text-left group relative overflow-hidden ${
+                          isSelected 
+                            ? 'bg-gradient-to-br from-blue-900/30 to-[#020617] border-blue-500/40 shadow-inner' 
+                            : 'bg-transparent border-transparent hover:bg-white/5'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between w-full">
+                          <span className={`text-xs font-bold truncate pr-2 ${isSelected ? 'text-cyan-400' : 'text-gray-300 group-hover:text-white'}`}>
+                            {topic.title}
+                          </span>
+                          <span className="shrink-0 pt-0.5">
+                            {isUnlocked ? (
+                              <Unlock className={`w-3 h-3 ${isSelected ? 'text-emerald-400' : 'text-gray-600'}`} />
+                            ) : (
+                              <Lock className="w-3 h-3 text-amber-500/70" />
+                            )}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between w-full mt-2 text-[10px] font-mono text-gray-500">
+                          <span>Length: {topic.duration}</span>
+                          {isUnlocked ? (
+                            <span className="text-emerald-500 bg-emerald-500/5 px-1.5 py-0.5 rounded border border-emerald-500/10 font-bold uppercase tracking-widest text-[9px]">READY</span>
+                          ) : (
+                            <span className="text-amber-400 bg-amber-400/5 px-1.5 py-0.5 rounded border border-amber-400/10 font-bold uppercase tracking-widest text-[9px]">₹125 NODE</span>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        </aside>
+
+        {/* PANEL 2: CORE RUNTIME DEVELOPMENT/TRADING SANDBOX GRID LAYER */}
+        <main className="flex-1 flex flex-col bg-[#020617] overflow-hidden border-r border-white/5">
+          {/* LAB NODE HEADER telemetry */}
+          <div className="px-6 py-3 bg-[#0a1020]/30 border-b border-white/5 flex items-center justify-between text-sm">
+            <div className="flex items-center space-x-3 truncate">
+              <span className="font-mono text-xs bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20 uppercase font-bold">Active Workspace</span>
+              <h3 className="font-bold text-white truncate">{selectedTopic.title}</h3>
             </div>
-            <button className="relative p-2 text-slate-400 hover:text-white transition-colors">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-cyan-500 rounded-full border border-[#020204]"></span>
+            <button 
+              onClick={handleRunDiagnostics}
+              disabled={isRunning}
+              className="flex items-center space-x-2 bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 disabled:from-gray-800 disabled:to-gray-900 text-white font-bold px-4 py-2 rounded-xl text-xs shadow-lg transition-all transform hover:-translate-y-0.5 active:translate-y-0 shrink-0"
+            >
+              {isRunning ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5 fill-current" />}
+              <span>{isRunning ? "PROCESSING MODULE..." : "RUN INTERACTIVE DIX"}</span>
             </button>
           </div>
-        </header>
 
-        <div className="p-8 lg:p-12 max-w-7xl mx-auto space-y-8">
-          
-          {/* Telemetry Row */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <StatCard 
-              title="Execution Uptime" 
-              value="99.9%" 
-              icon={Activity} 
-              subtitle="System stability index" 
-              chart={<TrendLineSvg color="#10b981"/>} // Emerald
-              trend="OPTIMAL"
-            />
-            <StatCard 
-              title="Data Ingestion" 
-              value="142.4 GB" 
-              icon={Bot} 
-              subtitle="Processed past 24h" 
-              chart={<AreaChartSvg colorPrimary="#06b6d4" colorSecondary="#22d3ee"/>} // Cyan
-            />
-            <StatCard 
-              title="Active Logic Loops" 
-              value="2,841" 
-              icon={Brain} 
-              subtitle="Concurrency metric" 
-              chart={<TrendLineSvg color="#8b5cf6"/>} // Purple
-            />
-            <StatCard 
-              title="Quantum XP Vector" 
-              value="24,590" 
-              icon={Zap} 
-              subtitle="Developer rank progression" 
-              trend="+450 XP"
-            />
+          {/* DYNAMIC INTERACTIVE LAB WORKSPACE VIEWPORT SWITCHER */}
+          <div className="flex-1 overflow-hidden relative min-h-[300px]">
+            {activeTrack === 'programming' ? (
+              // MONACO LIVE DEVELOPMENT ENGINE SUB-ARRAY
+              <Editor
+                height="100%"
+                defaultLanguage="python"
+                theme="vs-dark"
+                value={code}
+                onChange={(val) => setCode(val)}
+                options={{
+                  fontSize: 13,
+                  fontFamily: "Fira Code, Menlo, Monaco, monospace",
+                  minimap: { enabled: false },
+                  scrollbar: { verticalScrollbarSize: 8, horizontalScrollbarSize: 8 },
+                  padding: { top: 16 },
+                  lineNumbersMinChars: 3
+                }}
+              />
+            ) : (
+              // HIGH-TECH SIMULATED LIVE HISTORICAL ORDER CHARTING ENGINE
+              <div className="w-full h-full p-6 bg-[#040814] flex flex-col font-mono justify-between overflow-y-auto">
+                <div className="flex items-center justify-between border-b border-white/5 pb-3">
+                  <div className="flex items-center space-x-6">
+                    <div>
+                      <span className="text-gray-500 text-xs block">UNDERLYING LINK</span>
+                      <span className="text-white font-bold text-sm tracking-wider">NIFTY_50_INDEX_MOCK</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500 text-xs block">SPOT METRIC</span>
+                      <span className="text-emerald-400 font-bold text-sm">22,453.80 (+0.84%)</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500 text-xs block">VOL FREQUENCY</span>
+                      <span className="text-cyan-400 font-bold text-sm">1.24M Base/s</span>
+                    </div>
+                  </div>
+                  <div className="flex space-x-2 text-[10px]">
+                    <span className="px-2 py-0.5 bg-white/5 text-gray-400 border border-white/10 rounded">1m</span>
+                    <span className="px-2 py-0.5 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded">5m</span>
+                    <span className="px-2 py-0.5 bg-white/5 text-gray-400 border border-white/10 rounded">1H</span>
+                  </div>
+                </div>
+
+                {/* HIGH-FIDELITY HIGH-CONTRAST DATA VECTOR GRID GRAPHICS */}
+                <div className="flex-1 flex items-end justify-between px-4 py-8 relative">
+                  {/* Grid Lines Overlay Background */}
+                  <div className="absolute inset-0 flex flex-col justify-between pointer-events-none opacity-20 py-4">
+                    <div className="w-full h-px bg-white/10"></div>
+                    <div className="w-full h-px bg-white/10"></div>
+                    <div className="w-full h-px bg-white/10"></div>
+                    <div className="w-full h-px bg-white/10"></div>
+                  </div>
+                  
+                  {/* Simulated Candle Stacks Matrix */}
+                  <div className="flex items-end justify-between w-full h-48 z-10">
+                    <div className="w-4 flex flex-col items-center h-16 justify-end"><div className="w-0.5 h-12 bg-red-500 absolute mb-2"></div><div className="w-3 h-8 bg-red-500 rounded-sm"></div></div>
+                    <div className="w-4 flex flex-col items-center h-24 justify-end"><div className="w-0.5 h-16 bg-red-500 absolute mb-2"></div><div className="w-3 h-10 bg-red-500 rounded-sm"></div></div>
+                    <div className="w-4 flex flex-col items-center h-32 justify-end"><div className="w-0.5 h-20 bg-emerald-500 absolute mb-4"></div><div className="w-3 h-14 bg-emerald-500 rounded-sm"></div></div>
+                    <div className="w-4 flex flex-col items-center h-28 justify-end"><div className="w-0.5 h-14 bg-red-500 absolute mb-2"></div><div className="w-3 h-6 bg-red-500 rounded-sm"></div></div>
+                    <div className="w-4 flex flex-col items-center h-40 justify-end"><div className="w-0.5 h-28 bg-emerald-500 absolute mb-6"></div><div className="w-3 h-20 bg-emerald-500 rounded-sm"></div></div>
+                    <div className="w-4 flex flex-col items-center h-48 justify-end"><div className="w-0.5 h-36 bg-emerald-500 absolute mb-4"></div><div className="w-3 h-24 bg-emerald-500 rounded-sm"></div></div>
+                    <div className="w-4 flex flex-col items-center h-44 justify-end"><div className="w-0.5 h-20 bg-red-500 absolute mb-8"></div><div className="w-3 h-12 bg-red-500 rounded-sm"></div></div>
+                    <div className="w-4 flex flex-col items-center h-56 justify-end"><div className="w-0.5 h-44 bg-emerald-500 absolute mb-2"></div><div className="w-3 h-32 bg-emerald-500 rounded-sm shadow-[0_0_15px_rgba(16,185,129,0.3)] border border-emerald-400/40"></div></div>
+                  </div>
+                </div>
+
+                {/* TRADING ACTIONS EXECUTION MODULE LAYER */}
+                <div className="grid grid-cols-2 gap-4 border-t border-white/5 pt-4 bg-[#060b18]">
+                  <button onClick={() => setTerminalOutput([...terminalOutput, "ORDER TRANSMITTED: Simulated Buy Order executed at 22,453.80. Checking risk bounds..."])} className="bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 font-bold p-3 rounded-xl transition-all text-xs tracking-widest text-center">INITIALIZE SIMULATED BUY EXP NODE</button>
+                  <button onClick={() => setTerminalOutput([...terminalOutput, "ORDER TRANSMITTED: Simulated Short Order executed at 22,453.80. Checking risk bounds..."])} className="bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 font-bold p-3 rounded-xl transition-all text-xs tracking-widest text-center">INITIALIZE SIMULATED SHORT CONTRACT</button>
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Main Grid: Modules & Projects */}
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+          {/* LOWER RUNTIME DIAGNOSTIC DIAGNOSTICS LOG HUB TERMINAL */}
+          <div className="h-52 bg-[#040814] border-t border-white/5 font-mono text-xs flex flex-col shrink-0">
+            <div className="px-4 py-2 bg-[#080d1a] border-b border-white/5 text-gray-500 font-bold uppercase tracking-widest flex items-center justify-between shrink-0">
+              <span className="flex items-center"><Terminal className="w-3.5 h-3.5 text-cyan-400 mr-2" /> CORE DIAGNOSTIC OUTPUT TELEMETRY</span>
+              <button onClick={() => setTerminalOutput([])} className="text-[10px] hover:text-white transition-colors uppercase font-bold tracking-widest">Clear Logs</button>
+            </div>
+            <div className="flex-1 p-4 overflow-y-auto space-y-1.5 text-gray-400 selection:bg-blue-500/20">
+              {terminalOutput.map((log, index) => (
+                <div key={index} className="leading-relaxed whitespace-pre-wrap">
+                  <span className="text-cyan-500/70 mr-2">nexus_core_dx://</span>{log}
+                </div>
+              ))}
+            </div>
+          </div>
+        </main>
+
+        {/* PANEL 3: REAL-TIME CONTEXT-AWARE AI ADVISOR LAYER */}
+        <aside className="w-80 bg-[#060b18] flex flex-col overflow-hidden shrink-0 hidden xl:flex">
+          <div className="p-4 border-b border-white/5 bg-[#0a1020]/40 flex items-center space-x-3 shrink-0">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center border border-white/10 shrink-0">
+              <Cpu className="w-4 h-4 text-white" />
+            </div>
+            <div className="truncate">
+              <div className="text-xs font-black text-white truncate">{DASHBOARD_DATA[activeTrack].mentorName}</div>
+              <div className="text-[10px] text-cyan-400 font-mono tracking-wider truncate uppercase">{DASHBOARD_DATA[activeTrack].mentorRole}</div>
+            </div>
+          </div>
+
+          {/* CHAT LOG SCREEN AREA */}
+          <div className="flex-1 p-4 overflow-y-auto space-y-4">
+            {aiChatLogs.map((log, idx) => (
+              <div key={idx} className={`flex flex-col max-w-[85%] ${log.sender === 'user' ? 'ml-auto items-end' : 'items-start'}`}>
+                <div className={`p-3 rounded-2xl text-xs leading-relaxed ${
+                  log.sender === 'user' 
+                    ? 'bg-blue-600 text-white rounded-br-none' 
+                    : 'bg-[#0a1020] text-gray-300 border border-white/5 rounded-bl-none shadow-md'
+                }`}>
+                  {log.text}
+                </div>
+                <span className="text-[9px] text-gray-600 font-mono mt-1 px-1">{log.sender === 'user' ? 'Operator' : 'Mentor AI'}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* CHAT ENTRY INTERACTIVE TERMINAL LOOP FORM */}
+          <form onSubmit={handleSendAiComms} className="p-3 border-t border-white/5 bg-[#040814] flex items-center space-x-2 shrink-0">
+            <input 
+              type="text"
+              value={chatMessage}
+              onChange={(e) => setChatMessage(e.target.value)}
+              placeholder={`Query ${DASHBOARD_DATA[activeTrack].mentorRole}...`}
+              className="flex-1 bg-[#020617] border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-cyan-500 transition-colors"
+            />
+            <button type="submit" className="bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/50 text-cyan-400 p-2.5 rounded-xl transition-all shrink-0">
+              <Send className="w-3.5 h-3.5" />
+            </button>
+          </form>
+        </aside>
+      </div>
+
+      {/* ==========================================
+          MODAL: UNIVERSAL ₹125 UPI SIMULATOR GATE
+          ========================================== */}
+      {showPaymentModal && topicPendingUnlock && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 backdrop-blur-xl">
+          <div className="absolute inset-0 bg-[#020617]/80" onClick={() => setShowPaymentModal(false)}></div>
+          
+          <div className="relative bg-[#0a1020] border border-amber-500/30 rounded-3xl p-6 w-full max-w-md shadow-2xl overflow-hidden animate-modal-pop">
+            <div className="absolute -top-16 -left-16 w-32 h-32 bg-amber-500/10 blur-2xl rounded-full pointer-events-none"></div>
             
-            {/* Left Col (Takes up 2/3) */}
-            <div className="xl:col-span-2 space-y-8">
-              
-              {/* Premium IDE / Execution Module */}
-              <div className="bg-[#07070a]/80 backdrop-blur-2xl border border-white/[0.05] rounded-3xl p-1 relative overflow-hidden group">
-                <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none"/>
-                
-                <div className="bg-[#040406] rounded-[22px] p-8 border border-white/[0.02]">
-                  <div className="flex justify-between items-center mb-8">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_10px_rgba(52,211,153,0.5)]"/>
-                      <h3 className="text-sm font-bold text-white tracking-wide">ACTIVE_COMPILATION_MANIFOLD</h3>
-                    </div>
-                    <span className="text-[10px] font-mono bg-white/[0.03] border border-white/[0.05] text-slate-400 px-3 py-1.5 rounded-lg flex items-center">
-                      <Terminal className="w-3 h-3 mr-2" /> ID: CYB_PY_02
-                    </span>
-                  </div>
-                  
-                  <div className="flex flex-col md:flex-row gap-8">
-                    {/* Visualizer Block */}
-                    <div className="w-full md:w-[240px] shrink-0 bg-[#020203] rounded-2xl border border-white/[0.03] aspect-square flex flex-col items-center justify-center relative overflow-hidden group-hover:border-cyan-500/20 transition-colors duration-500">
-                      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-cyan-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"/>
-                      
-                      {/* Abstract Code UI */}
-                      <div className="w-32 h-32 relative">
-                        <svg viewBox="0 0 100 100" className="w-full h-full animate-spin-slow">
-                          <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="1" strokeDasharray="4 4" />
-                          <circle cx="50" cy="50" r="35" fill="none" stroke="rgba(6,182,212,0.3)" strokeWidth="2" strokeDasharray="60 40" />
-                          <circle cx="50" cy="50" r="25" fill="none" stroke="rgba(16,185,129,0.5)" strokeWidth="3" strokeDasharray="20 80" />
-                        </svg>
-                        <Play className="w-8 h-8 text-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 ml-1" />
-                      </div>
-                      
-                      <div className="absolute bottom-4 left-0 w-full px-4 flex justify-between text-[9px] font-mono text-slate-500">
-                        <span>CPU: 42%</span>
-                        <span>MEM: 1.2G</span>
-                      </div>
-                    </div>
-                    
-                    {/* Data Block */}
-                    <div className="flex-1 flex flex-col justify-center">
-                      <h4 className="text-3xl font-black text-white mb-3 tracking-tight">Python: Adv. Logic</h4>
-                      <p className="text-sm text-slate-400 mb-8 leading-relaxed font-light">
-                        Compiling the core engine for the Gym 1-Rep Max Calculator. Data structures are currently mapping spatial arrays for strength threshold predictions.
-                      </p>
-                      
-                      <div className="bg-[#020203] rounded-xl p-5 border border-white/[0.03] mb-6 relative overflow-hidden">
-                        <div className="absolute top-0 left-0 w-1 h-full bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.5)]"/>
-                        <div className="flex justify-between text-xs font-mono mb-3">
-                          <span className="text-slate-400">BUILD_PROGRESS</span>
-                          <span className="text-cyan-400 font-bold">65.0%</span>
-                        </div>
-                        <div className="w-full bg-[#111116] h-1.5 rounded-full overflow-hidden">
-                          <div className="h-full bg-cyan-400 relative" style={{ width: '65%' }}>
-                             <div className="absolute top-0 right-0 bottom-0 w-10 bg-gradient-to-r from-transparent to-white opacity-50"/>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex space-x-4">
-                        <button className="flex-1 bg-white text-black text-sm font-bold py-3.5 rounded-xl hover:bg-slate-200 transition-colors flex items-center justify-center">
-                          <Play className="w-4 h-4 mr-2 fill-black" /> Resume Engine
-                        </button>
-                        <button className="px-6 bg-white/[0.03] text-white text-sm font-bold py-3.5 rounded-xl border border-white/[0.05] hover:bg-white/[0.08] transition-colors">
-                          View Source
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Repositories */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                 {/* Project Card 1 */}
-                 <div className="bg-[#0b0b12]/60 backdrop-blur-2xl border border-white/[0.05] p-6 rounded-2xl hover:border-emerald-500/30 transition-all duration-300 group relative">
-                    <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.8)]"/>
-                    </div>
-                    <div className="bg-white/[0.03] w-12 h-12 rounded-xl flex items-center justify-center border border-white/[0.05] mb-5 group-hover:scale-110 transition-transform">
-                      <LayoutDashboard className="w-6 h-6 text-emerald-400" />
-                    </div>
-                    <h4 className="text-lg font-bold text-white mb-2">CoC Base Optimizer</h4>
-                    <p className="text-xs text-slate-500 mb-6 leading-relaxed line-clamp-2">Python-driven data science engine for spatial logic and defensive structuring.</p>
-                    <div className="flex items-center space-x-2">
-                      <span className="text-[10px] font-mono bg-[#050508] border border-white/[0.05] px-2 py-1 text-slate-400 rounded">Python</span>
-                      <span className="text-[10px] font-mono bg-[#050508] border border-white/[0.05] px-2 py-1 text-slate-400 rounded">Pandas</span>
-                    </div>
-                 </div>
-
-                 {/* New Project Action */}
-                 <div className="bg-transparent border border-dashed border-white/[0.1] p-6 rounded-2xl hover:bg-white/[0.02] hover:border-cyan-500/40 transition-all duration-300 cursor-pointer flex flex-col items-center justify-center text-center min-h-[200px] group">
-                    <div className="bg-[#050508] w-12 h-12 rounded-full flex items-center justify-center border border-white/[0.05] mb-4 group-hover:bg-cyan-500/10 transition-colors">
-                      <Code2 className="w-5 h-5 text-slate-500 group-hover:text-cyan-400" />
-                    </div>
-                    <h4 className="text-sm font-bold text-slate-300 group-hover:text-white transition-colors">Deploy New Scaffold</h4>
-                    <p className="text-[10px] font-mono text-slate-600 mt-2">Initialize empty vector</p>
-                 </div>
-              </div>
-
+            <div className="flex items-center space-x-3 mb-4 text-amber-400">
+              <AlertTriangle className="w-6 h-6 shrink-0" />
+              <h3 className="text-lg font-bold text-white tracking-wide">Secure Transaction Gate Required</h3>
             </div>
 
-            {/* Right Col (Takes up 1/3) */}
-            <div className="space-y-8">
-              
-              {/* Challenge Card */}
-              <div className="bg-gradient-to-b from-[#0b0b12] to-[#07070a] border border-white/[0.05] rounded-3xl p-6 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 blur-[50px] pointer-events-none"/>
-                
-                <h3 className="text-xs font-bold text-white uppercase tracking-widest flex items-center mb-6">
-                  <Brain className="w-4 h-4 mr-2 text-cyan-400" /> Neural Challenge
-                </h3>
-                
-                <div className="bg-[#040406] rounded-xl p-5 border border-white/[0.03] mb-6 group cursor-pointer hover:border-cyan-500/30 transition-colors relative">
-                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[2px] h-1/2 bg-cyan-500/50 rounded-r opacity-0 group-hover:opacity-100 transition-opacity"/>
-                  <p className="text-xs text-slate-300 font-mono leading-relaxed">
-                    <span className="text-cyan-400 mr-2">»</span>
-                    Write a Python function to parse a complex JSON log file and extract anomaly patterns using recursion.
-                  </p>
-                </div>
-                
-                <div className="flex items-center justify-between mt-auto">
-                  <span className="text-[10px] font-mono text-cyan-400 bg-cyan-400/10 px-2 py-1 rounded border border-cyan-400/20">
-                    +150 XP Reward
-                  </span>
-                  <button className="text-xs font-bold text-black bg-cyan-400 hover:bg-cyan-300 px-4 py-2 rounded-lg transition-colors">
-                    Execute
-                  </button>
-                </div>
-              </div>
+            <p className="text-gray-400 text-xs leading-relaxed mb-6">
+              You are accessing a secured lecture payload node: <span className="text-white font-bold">[{topicPendingUnlock.title}]</span>. Under the micro-modular configuration, this track chunk requires localized validation.
+            </p>
 
-              {/* Activity Feed */}
-              <div className="bg-[#0b0b12]/60 backdrop-blur-2xl border border-white/[0.05] rounded-3xl p-6">
-                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 border-b border-white/[0.05] pb-4">
-                  System Logs
-                </h3>
-                
-                <div className="space-y-5 relative">
-                  {/* Connecting Line */}
-                  <div className="absolute left-[7px] top-2 bottom-2 w-[1px] bg-white/[0.05] z-0"/>
-                  
-                  {[
-                    { id: 1, text: "Model weights optimized", time: "2m ago", status: "success", icon: CheckCircle2 },
-                    { id: 2, text: "Data ingestion pipeline active", time: "1h ago", status: "info", icon: Activity },
-                    { id: 3, text: "User Engineer_001 authenticated", time: "3h ago", status: "neutral", icon: LayoutDashboard },
-                    { id: 4, text: "Previous instance terminated", time: "Yday", status: "neutral", icon: LogOut },
-                  ].map((log) => (
-                    <div key={log.id} className="flex items-start relative z-10 group cursor-default">
-                      <div className={`w-4 h-4 rounded-full mt-0.5 mr-4 flex items-center justify-center border-2 border-[#0b0b12] shadow-sm ${
-                        log.status === 'success' ? 'bg-emerald-400 text-black' : 
-                        log.status === 'info' ? 'bg-cyan-400 text-black' : 'bg-slate-600 text-white'
-                      }`}>
-                        <log.icon className="w-2.5 h-2.5" />
-                      </div>
-                      <div>
-                        <p className="text-xs text-slate-300 font-medium group-hover:text-white transition-colors">{log.text}</p>
-                        <span className="text-[10px] text-slate-500 font-mono">{log.time}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+            <div className="bg-[#020617] rounded-2xl p-4 border border-white/5 space-y-3 mb-6 font-mono text-xs">
+              <div className="flex justify-between text-gray-500"><span>Ledger Price Node</span><span className="text-white font-bold">₹125.00</span></div>
+              <div className="flex justify-between text-gray-500"><span>Platform Surcharges</span><span className="text-emerald-400 font-bold">₹0.00 (Free)</span></div>
+              <div className="w-full h-px bg-white/5 my-2"></div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-400">Total Due (UPI Engine)</span>
+                <span className="text-cyan-400 font-black">₹125.00</span>
               </div>
-
             </div>
 
+            {/* ACTION SIMULATION CONTROLS */}
+            <div className="flex flex-col gap-2.5">
+              <button 
+                onClick={executeLedgerPaymentSimulation}
+                className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white font-black py-3.5 rounded-xl text-xs tracking-widest shadow-lg transition-all transform hover:-translate-y-0.5"
+              >
+                SIMULATE SUCCESSFUL UPI PAY (₹125)
+              </button>
+              <button 
+                onClick={() => { setShowPaymentModal(false); setTopicPendingUnlock(null); }}
+                className="w-full py-3 rounded-xl bg-white/5 text-gray-400 hover:text-white text-xs font-bold transition-colors border border-transparent hover:border-white/10"
+              >
+                Abort Sequence Request
+              </button>
+            </div>
+            
+            <div className="mt-4 text-[10px] text-gray-600 text-center flex items-center justify-center space-x-2 font-mono">
+              <CheckCircle2 className="w-3 h-3 text-emerald-500" />
+              <span>Razorpay API Secure Payload Verification Layer</span>
+            </div>
           </div>
         </div>
-      </main>
-
+      )}
     </div>
   );
 }

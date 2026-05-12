@@ -1,6 +1,6 @@
 {
   "name": "ai-coding-lab",
-  "homepage": "[https://sagnik-coder.github.io/nexusdev/](https://sagnik-coder.github.io/nexusdev/)",
+  "homepage": "https://sagnik-coder.github.io/nexusdev",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -45,6 +45,7 @@
   "devDependencies": {
     "@tailwindcss/cli": "^4.2.2",
     "autoprefixer": "^10.4.27",
+    "gh-pages": "^6.3.0",
     "postcss": "^8.5.9",
     "tailwindcss": "^4.2.2"
   }
