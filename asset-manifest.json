@@ -1,0 +1,14 @@
+{
+  "files": {
+    "main.css": "/[https://sagnik-coder.github.io/nexusdev/](https://sagnik-coder.github.io/nexusdev/)/static/css/main.31d6cfe0.css",
+    "main.js": "/[https://sagnik-coder.github.io/nexusdev/](https://sagnik-coder.github.io/nexusdev/)/static/js/main.39506cf6.js",
+    "static/js/453.86e19182.chunk.js": "/[https://sagnik-coder.github.io/nexusdev/](https://sagnik-coder.github.io/nexusdev/)/static/js/453.86e19182.chunk.js",
+    "index.html": "/[https://sagnik-coder.github.io/nexusdev/](https://sagnik-coder.github.io/nexusdev/)/index.html",
+    "main.39506cf6.js.map": "/[https://sagnik-coder.github.io/nexusdev/](https://sagnik-coder.github.io/nexusdev/)/static/js/main.39506cf6.js.map",
+    "453.86e19182.chunk.js.map": "/[https://sagnik-coder.github.io/nexusdev/](https://sagnik-coder.github.io/nexusdev/)/static/js/453.86e19182.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.31d6cfe0.css",
+    "static/js/main.39506cf6.js"
+  ]
+}
