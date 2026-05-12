@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/nexusdev/static/css/main.31d6cfe0.css",
-    "main.js": "/nexusdev/static/js/main.dcf5a00c.js",
+    "main.js": "/nexusdev/static/js/main.a8b094ff.js",
     "static/js/453.86e19182.chunk.js": "/nexusdev/static/js/453.86e19182.chunk.js",
     "index.html": "/nexusdev/index.html",
-    "main.dcf5a00c.js.map": "/nexusdev/static/js/main.dcf5a00c.js.map",
+    "main.a8b094ff.js.map": "/nexusdev/static/js/main.a8b094ff.js.map",
     "453.86e19182.chunk.js.map": "/nexusdev/static/js/453.86e19182.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.31d6cfe0.css",
-    "static/js/main.dcf5a00c.js"
+    "static/js/main.a8b094ff.js"
   ]
 }
