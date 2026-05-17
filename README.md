@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <a href="https://sagnik-coder.github.io/nexusdev/"><strong>🚀 View Live Command Center</strong></a>
+  <a href="https://sagniksengupta24.github.io/nexusdev/"><strong>🚀 View Live Command Center</strong></a>
   <br>
 </p>
 
